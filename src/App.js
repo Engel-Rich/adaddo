@@ -1,16 +1,18 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 import { Menu } from 'antd';
 import { Route, Routes, useNavigate,} from 'react-router-dom';
-import {DashboardOutlined,RiseOutlined, HomeOutlined, ShopOutlined,RestOutlined,CarOutlined,UsergroupAddOutlined,BookOutlined,LogoutOutlined} from '@ant-design/icons'
-import Login from './pages/Login';
+import {DashboardOutlined,RiseOutlined,  ShopOutlined,RestOutlined,CarOutlined,UsergroupAddOutlined,BookOutlined,LogoutOutlined} from '@ant-design/icons'
+import {Login,SignOut}from './pages/Login';
 import { useState } from 'react';
 import { authentication } from './firebase.config';
 import { onAuthStateChanged } from 'firebase/auth';
+import Loader from './Components/loading';
+import RestaurentPage from './pages/Restaurents';
 
 
 const items = [
-  { label: "Home", icon:<HomeOutlined/>, key:'/'},
+  // { label: "Home", icon:<HomeOutlined/>, key:'/'},
   { label: "Dashboard", icon:<DashboardOutlined/>, key:'/Dashboard' },
   { label: "Restaurents", icon:<RestOutlined />, key:'/Restaurents'  },
   { label: "Stores", icon:<ShopOutlined />, key:'/Stores' },
@@ -25,14 +27,15 @@ const items = [
 function  Content() {
   return <div>
     <Routes>
-      <Route path='/' element={<div>Home</div>}></Route>
+      {/* <Route path='/' element={<div>Home</div>}></Route> */}
       <Route path='/Dashboard' element={<div>Dashboard</div>} ></Route>
-      <Route path='/Restaurents' element={<div>Restaurents</div>} ></Route>
+      <Route path='/Restaurents' element={<RestaurentPage/>} ></Route>
       <Route path='/Stores' element={<div>Stores</div>} ></Route>
       <Route path='/Drivers' element= {<div>Drivers</div>}  ></Route>
       <Route path='/Users' element ={<div>Users</div>} ></Route>
       <Route path='/Courses' element ={<div>Courses</div>} ></Route>
       <Route path='/Orders' element= {<div>Orders</div>} ></Route>
+      <Route path='/SignOut' element= {<SignOut/>} ></Route>
     </Routes>
   </div>
 }
@@ -72,25 +75,28 @@ function Footer() {
 function App() {
 
   const [loged, setLoged]= useState(false);
+  const [loading, setLoading]= useState(true);
   const auth= authentication;
   onAuthStateChanged(auth,(user) => {
       if(user){
         setLoged(true);
+        setLoading(false);
       }else{
         setLoged(false)
+        setLoading(false);
       }
   });
-  return !loged ?(
+  return loading ? <div className='container p-5 m-5 d-flex justify-content-center min-vh-100 align-items-center'>
+      <Loader/>
+  </div>: 
+  (!loged ?(
     <Login/>
   ):
-  (
-  <div style={{display:'flex', flexDirection:'column', height:'100vh'}}>
+  ( <div style={{display:'flex', flexDirection:'column', height:'100vh'}}>
     <Headers/>  
     <Main/>
     <Footer/>
-  </div>
-    
-  );
+  </div>));
 }
 
 export default App;
